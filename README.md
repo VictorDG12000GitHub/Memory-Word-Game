@@ -1,1 +1,1 @@
-MMemory-Word-Game
+Memory-Word-Game
