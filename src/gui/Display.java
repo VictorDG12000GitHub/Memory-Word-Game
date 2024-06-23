@@ -156,7 +156,7 @@ public class Display extends JFrame {
 
             wordIndex = 0;
             //Timer starts with 1-second delay for the first word.
-            showTimer = new Timer(1000, new ActionListener() { 
+            showTimer = new Timer(4500, new ActionListener() { 
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (wordIndex < n) {
@@ -182,11 +182,8 @@ public class Display extends JFrame {
                         wordPanel.repaint();
                         //After the first word, set delay to 4 seconds.
                         wordIndex++;
-                        if (wordIndex == 1) {
-                            showTimer.setDelay(4000);
-                        }
                         //Timer to hide the word 0.5 seconds before the next word.
-                        hideTimer = new Timer(3500, new ActionListener() { 
+                        hideTimer = new Timer(4000, new ActionListener() { 
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 wordPanel.remove(currentWordLabel);
@@ -203,7 +200,7 @@ public class Display extends JFrame {
                     }
                 }
             });
-            showTimer.setInitialDelay(0); 
+            showTimer.setInitialDelay(570); 
             showTimer.start();
         } catch (NumberFormatException e) {
             outputArea.append("Invalid input. Please enter a valid integer.\n");
