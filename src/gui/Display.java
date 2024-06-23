@@ -4,13 +4,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class Display extends JFrame {
 
@@ -28,12 +31,18 @@ public class Display extends JFrame {
     private int wordIndex;
     private JLabel currentWordLabel;
     private List<String> wordsDisplayed; //List to store the words that are shown.
+    private List<String> currentSequence; //List to store the current sequence of words.
+    private Map<String, Map<String, String>> translations;
+    private int sequenceLength;
 
     public Display() {
         setTitle("Memory Word Game");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+
+        //Load translations from JSON.
+        loadTranslations();
 
         //Main panel.
         JPanel panel = new JPanel(new BorderLayout());
@@ -68,7 +77,6 @@ public class Display extends JFrame {
         });
         panel.add(restartButton, BorderLayout.SOUTH);
 
-        //ActionListener to StartButton;
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -79,28 +87,71 @@ public class Display extends JFrame {
         add(panel);
     }
 
+    private void loadTranslations() {
+        translations = new HashMap<>();
+        JSONParser parser = new JSONParser();
+        try {
+            String absolutePath = System.getProperty("user.dir") + "/src/gui/translations.json"; 
+            InputStream inputStream = new FileInputStream(absolutePath);
+            Reader reader = new InputStreamReader(inputStream);
+            JSONObject jsonTranslations = (JSONObject) parser.parse(reader);
+
+            for (Object langObj : jsonTranslations.keySet()) {
+                String lang = (String) langObj;
+                JSONObject langTranslations = (JSONObject) jsonTranslations.get(lang);
+                Map<String, String> langMap = new HashMap<>();
+                for (Object keyObj : langTranslations.keySet()) {
+                    String key = (String) keyObj;
+                    String value = (String) langTranslations.get(key);
+                    langMap.put(key, value);
+                }
+                translations.put(lang, langMap);
+            }
+
+            System.out.println("Traducciones cargadas correctamente: " + translations);
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error loading translations: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     private void startGame() {
         int languageIndex = languageComboBox.getSelectedIndex();
         int modeIndex = modeComboBox.getSelectedIndex();
         outputArea.setText(""); //Clean the output.
 
+        //Get selected language code (es, en, de, it, fr).
+        String languageCode;
         switch (languageIndex) {
             case 0:
-                outputArea.append("(1.Modo en aumento, 2.Modo concreto).\n¿Qué modo quieres?\n");
+                languageCode = "es";
                 break;
             case 1:
-                outputArea.append("(1.Increasing mode, 2.Concrete mode).\nWhich mode do you want?\n");
+                languageCode = "en";
                 break;
             case 2:
-                outputArea.append("(1.Erhöhungsmodus, 2.Betonmodus).\nWelchen Modus möchten Sie?\n");
+                languageCode = "de";
                 break;
             case 3:
-                outputArea.append("(1.Modalità crescente, 2.Modalità calcestruzzo).\nQuale modalità desideri?\n");
+                languageCode = "it";
                 break;
             case 4:
-                outputArea.append("(1.Mode croissant, 2.Mode béton).\nQuel mode souhaitez-vous?\n");
+                languageCode = "fr";
                 break;
+            default:
+                outputArea.append("Selección de idioma inválida.\n");
+                return;
         }
+
+        if (!translations.containsKey(languageCode)) {
+            System.err.println("No se encontraron traducciones para el idioma: " + languageCode);
+            return;
+        }
+
+        //Display start game message based on selected language.
+        String startGameMessage = translations.get(languageCode).get("startGameMessage");
+        outputArea.append(startGameMessage + "\n");
+        updateUIComponents(languageCode);
 
         //Remove start button and show words.
         Container parent = startButton.getParent();
@@ -111,13 +162,14 @@ public class Display extends JFrame {
         //Show restart button.
         restartButton.setVisible(true);
 
-        //Create and add word panel.
+        //Create and add word panel..
         wordPanel = new JPanel(new GridBagLayout());
         parent.add(wordPanel, BorderLayout.CENTER);
         parent.revalidate();
         parent.repaint();
 
         wordsDisplayed = new ArrayList<>();
+
         //Relative path.
         String userDir = System.getProperty("user.dir");
         String relativePath = "src/gui/words.csv";
@@ -129,46 +181,121 @@ public class Display extends JFrame {
         //Mode selection.
         switch (modeIndex) {
             case 0:
-                randomGenIncrease();
+                sequenceLength = 1; 
+                randomGenIncrease(languageCode);
                 break;
             case 1:
-                randomGenConcrete();
+                randomGenConcrete(languageCode);
                 break;
             default:
-                outputArea.append("Invalid mode selected.\n");
+                outputArea.append(translations.get(languageCode).get("invalidModeSelection") + "\n");
                 break;
         }
     }
 
-    private void randomGenIncrease() {
-        outputArea.append("Increasing mode selected.\n");
+    private List<String> readWordsFromCSV(String fileName) {
+        List<String> words = new ArrayList<>();
+        String line;
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+
+                if (parts.length >= 2) {
+                    String word = parts[1].trim().replaceAll("\"", "");
+                    words.add(word);
+                }
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error reading CSV file: " + e.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return words;
     }
 
-    private void randomGenConcrete() {
-        String input = JOptionPane.showInputDialog(this, "Enter the number of words to display:");
-        outputArea.append("Concrete mode selected.\n");
+    private void randomGenIncrease(String languageCode) {
+        String increasingModeMessage = translations.get(languageCode).get("increasingMode");
+        outputArea.append(increasingModeMessage + "\n");
+
+        wordIndex = 0;
+        currentSequence = new ArrayList<>();
+
+        showTimer = new Timer(4500, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (currentWordLabel != null) {
+                    wordPanel.remove(currentWordLabel);
+                    wordPanel.revalidate();
+                    wordPanel.repaint();
+                }
+
+                while (currentSequence.size() < sequenceLength) {
+                    int idWord = random.nextInt(dictionary.size());
+                    String word = dictionary.get(idWord);
+                    currentSequence.add(word);
+                }
+
+                StringBuilder sequenceToDisplay = new StringBuilder();
+                for (String w : currentSequence) {
+                    sequenceToDisplay.append(w).append(" ");
+                }
+                currentWordLabel = new JLabel(sequenceToDisplay.toString().trim(), SwingConstants.CENTER);
+                currentWordLabel.setFont(new Font("Arial", Font.BOLD, 36));
+                GridBagConstraints gbc = new GridBagConstraints();
+                gbc.gridx = 0;
+                gbc.gridy = 0;
+                gbc.weightx = 1.0;
+                gbc.weighty = 1.0;
+                gbc.anchor = GridBagConstraints.CENTER;
+                wordPanel.add(currentWordLabel, gbc);
+                wordPanel.revalidate();
+                wordPanel.repaint();
+
+                hideTimer = new Timer(4000, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        wordPanel.remove(currentWordLabel);
+                        wordPanel.revalidate();
+                        wordPanel.repaint();
+                        hideTimer.stop();
+                    }
+                });
+                hideTimer.setRepeats(false);
+                hideTimer.start();
+
+                sequenceLength++;
+                showTimer.stop();
+
+                askWords(languageCode);
+            }
+        });
+        showTimer.setInitialDelay(570);
+        showTimer.start();
+    }
+
+    private void randomGenConcrete(String languageCode) {
+        String input = JOptionPane.showInputDialog(this, translations.get(languageCode).get("enterNumberOfWords"));
         try {
             int n = Integer.parseInt(input);
             if (n <= 0) {
-                outputArea.append("Please enter a positive number.\n");
+                outputArea.append(translations.get(languageCode).get("invalidNumber") + "\n");
                 return;
             }
 
             wordIndex = 0;
-            //Timer starts with 1-second delay for the first word.
-            showTimer = new Timer(4500, new ActionListener() { 
+            currentSequence = new ArrayList<>();
+
+            showTimer = new Timer(4500, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (wordIndex < n) {
-                        if (currentWordLabel != null) {
-                            wordPanel.remove(currentWordLabel);
-                            wordPanel.revalidate();
-                            wordPanel.repaint();
-                        }
+                    if (currentWordLabel != null) {
+                        wordPanel.remove(currentWordLabel);
+                        wordPanel.revalidate();
+                        wordPanel.repaint();
+                    }
 
-                        int idWord = random.nextInt(1292);
+                    if (wordIndex < n) {
+                        int idWord = random.nextInt(dictionary.size());
                         String word = dictionary.get(idWord);
-                        wordsDisplayed.add(word);
+                        currentSequence.add(word);
                         currentWordLabel = new JLabel(word, SwingConstants.CENTER);
                         currentWordLabel.setFont(new Font("Arial", Font.BOLD, 36));
                         GridBagConstraints gbc = new GridBagConstraints();
@@ -180,10 +307,8 @@ public class Display extends JFrame {
                         wordPanel.add(currentWordLabel, gbc);
                         wordPanel.revalidate();
                         wordPanel.repaint();
-                        //After the first word, set delay to 4 seconds.
-                        wordIndex++;
-                        //Timer to hide the word 0.5 seconds before the next word.
-                        hideTimer = new Timer(4000, new ActionListener() { 
+
+                        hideTimer = new Timer(4000, new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 wordPanel.remove(currentWordLabel);
@@ -194,51 +319,41 @@ public class Display extends JFrame {
                         });
                         hideTimer.setRepeats(false);
                         hideTimer.start();
+
+                        wordIndex++;
                     } else {
                         showTimer.stop();
-                        askWords(); 
+                        askWords(languageCode);
                     }
                 }
             });
-            showTimer.setInitialDelay(570); 
+            showTimer.setInitialDelay(570);
             showTimer.start();
         } catch (NumberFormatException e) {
-            outputArea.append("Invalid input. Please enter a valid integer.\n");
+            outputArea.append(translations.get(languageCode).get("invalidNumber") + "\n");
         }
     }
 
-    private void askWords() {
+    private void askWords(String languageCode) {
         int correctCount = 0;
-        for (int i = 0; i < wordsDisplayed.size(); i++) {
-            String userInput = JOptionPane.showInputDialog(this, "Enter word " + (i + 1) + ":");
-            if (userInput != null && userInput.equals(wordsDisplayed.get(i))) {
+        for (int i = 0; i < currentSequence.size(); i++) {
+            String userInput = JOptionPane.showInputDialog(this, translations.get(languageCode).get("enterWord") + " " + (i + 1) + ":");
+            if (userInput != null && userInput.equals(currentSequence.get(i))) {
                 correctCount++;
             }
         }
-        JOptionPane.showMessageDialog(this, "You remembered " + correctCount + " out of " + wordsDisplayed.size() + " words correctly.");
+        JOptionPane.showMessageDialog(this, translations.get(languageCode).get("rememberedWords")
+                .replace("{0}", String.valueOf(correctCount))
+                .replace("{1}", String.valueOf(currentSequence.size())));
 
-        outputArea.append("You remembered " + correctCount + " out of " + wordsDisplayed.size() + " words correctly.\n");
-        outputArea.setCaretPosition(outputArea.getDocument().getLength());
+        outputArea.append(translations.get(languageCode).get("rememberedWords")
+                .replace("{0}", String.valueOf(correctCount))
+                .replace("{1}", String.valueOf(currentSequence.size())) + "\n");
 
-        wordsDisplayed.clear();
-    }
+        currentSequence.clear();
+        sequenceLength = 1;
 
-    private List<String> readWordsFromCSV(String fileName) {
-        List<String> words = new ArrayList<>();
-        String line;
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-
-                if (parts.length >= 2) {
-                    String word = parts[1].trim().replaceAll("\"", ""); 
-                    words.add(word);
-                }
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error reading CSV file: " + e.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
-        }
-        return words;
+        restartGame();
     }
 
     private void restartGame() {
@@ -261,6 +376,11 @@ public class Display extends JFrame {
         parent.add(startButton, BorderLayout.CENTER);
         parent.revalidate();
         parent.repaint();
+    }
+
+    private void updateUIComponents(String languageCode) {
+        startButton.setText(translations.get(languageCode).get("startGameButton"));
+        restartButton.setText(translations.get(languageCode).get("restartButton"));
     }
 
     public static void main(String[] args) {

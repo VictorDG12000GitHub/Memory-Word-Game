@@ -1,0 +1,62 @@
+{
+  "es": {
+    "startGameMessage": "(1.Modo en aumento, 2.Modo concreto).\n¿Qué modo quieres?\n",
+    "increasingMode": "Modo en aumento seleccionado.\n",
+    "concreteMode": "Modo concreto seleccionado.\n",
+    "enterNumberOfWords": "Ingrese la cantidad de palabras a mostrar:",
+    "invalidNumber": "Por favor, ingrese un número positivo.\n",
+    "rememberedWords": "Recordaste {0} de {1} palabras correctamente.\n",
+    "startGameButton": "Comenzar Juego",
+    "restartButton": "Reiniciar",
+    "invalidLanguage": "Selección de idioma inválida.\n",
+    "enterWord": "Ingrese la palabra"
+  },
+  "en": {
+    "startGameMessage": "(1.Increasing mode, 2.Concrete mode).\nWhich mode do you want?\n",
+    "increasingMode": "Increasing mode selected.\n",
+    "concreteMode": "Concrete mode selected.\n",
+    "enterNumberOfWords": "Enter the number of words to display:",
+    "invalidNumber": "Please enter a positive number.\n",
+    "rememberedWords": "You remembered {0} out of {1} words correctly.\n",
+    "startGameButton": "Start Game",
+    "restartButton": "Restart",
+    "invalidLanguage": "Invalid language selection.\n",
+    "enterWord": "Enter word"
+  },
+  "de": {
+    "startGameMessage": "(1.Erhöhungsmodus, 2.Betonmodus).\nWelchen Modus möchten Sie?\n",
+    "increasingMode": "Erhöhungsmodus ausgewählt.\n",
+    "concreteMode": "Betonmodus ausgewählt.\n",
+    "enterNumberOfWords": "Geben Sie die Anzahl der anzuzeigenden Wörter ein:",
+    "invalidNumber": "Bitte geben Sie eine positive Zahl ein.\n",
+    "rememberedWords": "Sie haben {0} von {1} Wörtern korrekt erinnert.\n",
+    "startGameButton": "Spiel starten",
+    "restartButton": "Neustart",
+    "invalidLanguage": "Ungültige Sprachauswahl.\n",
+    "enterWord": "Geben Sie das Wort ein"
+  },
+  "it": {
+    "startGameMessage": "(1.Modalità crescente, 2.Modalità calcestruzzo).\nQuale modalità desideri?\n",
+    "increasingMode": "Modalità crescente selezionata.\n",
+    "concreteMode": "Modalità calcestruzzo selezionata.\n",
+    "enterNumberOfWords": "Inserisci il numero di parole da visualizzare:",
+    "invalidNumber": "Si prega di inserire un numero positivo.\n",
+    "rememberedWords": "Hai ricordato {0} su {1} parole correttamente.\n",
+    "startGameButton": "Inizia gioco",
+    "restartButton": "Ricomincia",
+    "invalidLanguage": "Selezione lingua non valida.\n",
+    "enterWord": "Inserisci parola"
+  },
+  "fr": {
+    "startGameMessage": "(1.Mode croissant, 2.Mode béton).\nQuel mode souhaitez-vous?\n",
+    "increasingMode": "Mode croissant sélectionné.\n",
+    "concreteMode": "Mode béton sélectionné.\n",
+    "enterNumberOfWords": "Entrez le nombre de mots à afficher:",
+    "invalidNumber": "Veuillez entrer un nombre positif.\n",
+    "rememberedWords": "Vous avez rappelé {0} sur {1} mots correctement.\n",
+    "startGameButton": "Commencer le jeu",
+    "restartButton": "Redémarrer",
+    "invalidLanguage": "Sélection de langue invalide.\n",
+    "enterWord": "Entrez le mot"
+  }
+}
