@@ -4,94 +4,41 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Display extends JFrame {
-	
-	public static Random random = new Random();
-	public int idWord;
-    public static final String[] dictionary= {
-    	    "A", "Ability", "Able", "Above", "Abroad", "Absence", "Absolute", "Abstract", "Abuse", "Academic",
-    	    "Accept", "Access", "Accident", "Accommodation", "Accompany", "Accomplish", "According", "Account",
-    	    "Accurate", "Accuse", "Achieve", "Achievement", "Acid", "Acknowledge", "Acquire", "Across", "Act",
-    	    "Action", "Active", "Activity", "Actor", "Actress", "Actual", "Actually", "Ad", "Adapt", "Add",
-    	    "Addition", "Additional", "Address", "Adequate", "Adjust", "Administration", "Admire", "Admission",
-    	    "Admit", "Adopt", "Adult", "Advance", "Advanced", "Advantage", "Adventure", "Advertising", "Advice",
-    	    "Advise", "Affect", "Afford", "Afraid", "After", "Afternoon", "Again", "Against", "Age", "Agency",
-    	    "Agenda", "Agent", "Aggressive", "Ago", "Agree", "Agreement", "Ahead", "Aid", "Aim", "Air", "Aircraft",
-    	    "Airline", "Airport", "Alarm", "Album", "Alcohol", "Alive", "All", "Ally", "Almost", "Alone", "Along",
-    	    "Already", "Alright", "Also", "Alter", "Alternative", "Although", "Always", "Amazing", "Ambition",
-    	    "Ambitious", "Among", "Amount", "Analysis", "Analyze", "Ancient", "And", "Anger", "Angle", "Angry",
-    	    "Animal", "Anniversary", "Announce", "Annual", "Another", "Answer", "Anxiety", "Anxious", "Any",
-    	    "Anybody", "Anyone", "Anything", "Anyway", "Anywhere", "Apart", "Apartment", "Apology", "Apparent",
-    	    "Apparently", "Appeal", "Appear", "Appearance", "Apple", "Application", "Apply", "Appoint", "Appointment",
-    	    "Appreciate", "Approach", "Appropriate", "Approval", "Approve", "Approximately", "Arab", "Architect",
-    	    "Architecture", "Area", "Argue", "Argument", "Arise", "Arm", "Armed", "Army", "Around", "Arrange",
-    	    "Arrangement", "Arrest", "Arrival", "Arrive", "Art", "Article", "Artist", "Artistic", "As", "Asian",
-    	    "Aside", "Ask", "Asleep", "Aspect", "Assault", "Assert", "Assess", "Assessment", "Asset", "Assign",
-    	    "Assignment", "Assist", "Assistance", "Assistant", "Associate", "Association", "Assume", "Assumption",
-    	    "Assure", "At", "Athlete", "Athletic", "Atmosphere", "Attach", "Attack", "Attempt", "Attend", "Attention",
-    	    "Attitude", "Attract", "Attraction", "Attractive", "Attribute", "Audience", "Author", "Authority",
-    	    "Available", "Average", "Avoid", "Award", "Aware", "Awareness", "Away", "Awful", "Baby", "Back",
-    	    "Background", "Backyard", "Bacteria", "Bad", "Badly", "Bag", "Balance", "Ball", "Ban", "Band",
-    	    "Bank", "Bar", "Barely", "Bargain", "Barrier", "Base", "Baseball", "Basic", "Basically", "Basis",
-    	    "Basket", "Basketball", "Bath", "Bathroom", "Battery", "Battle", "Beach", "Be", "Bear", "Beat",
-    	    "Beautiful", "Beauty", "Because", "Become", "Bed", "Bedroom", "Beer", "Before", "Begin", "Beginning",
-    	    "Behavior", "Behind", "Being", "Belief", "Believe", "Bell", "Belong", "Below", "Belt", "Bench",
-    	    "Bend", "Beneath", "Benefit", "Beside", "Besides", "Best", "Bet", "Better", "Between", "Beyond",
-    	    "Bible", "Big", "Bike", "Bill", "Billion", "Bind", "Biological", "Bird", "Birth", "Birthday",
-    	    "Bit", "Bite", "Black", "Blade", "Blame", "Blanket", "Blind", "Block", "Blood", "Blow", "Blue",
-    	    "Board", "Boat", "Body", "Bomb", "Bond", "Bone", "Book", "Boom", "Boot", "Border", "Born",
-    	    "Borrow", "Boss", "Both", "Bottle", "Bottom", "Boundary", "Bowl", "Box", "Boy", "Boyfriend",
-    	    "Brain", "Branch", "Brand", "Brave", "Bread", "Break", "Breakfast", "Breast", "Breath", "Breathe",
-    	    "Brick", "Bridge", "Brief", "Bright", "Brilliant", "Bring", "British", "Broad", "Broken", "Brother",
-    	    "Brown", "Brush", "Buck", "Budget", "Build", "Building", "Bullet", "Bunch", "Burn", "Bus", "Business",
-    	    "Busy", "But", "Butter", "Button", "Buy", "Buyer", "By", "Cabin", "Cabinet", "Cable", "Cake", "Calculate",
-    	    "Call", "Calm", "Camera", "Camp", "Campaign", "Campus", "Can", "Canadian", "Cancel", "Cancer", "Candidate",
-    	    "Cap", "Capability", "Capable", "Capacity", "Capital", "Captain", "Capture", "Car", "Card", "Care",
-    	    "Career", "Careful", "Carefully", "Carrier", "Carry", "Case", "Cash", "Cast", "Cat", "Catch", "Category",
-    	    "Cattle", "Cause", "Cease", "Ceiling", "Celebrate", "Celebration", "Celebrity", "Cell", "Center",
-    	    "Central", "Century", "CEO", "Ceremony", "Certain", "Certainly", "Chain", "Chair", "Chairman", "Challenge",
-    	    "Chamber", "Champion", "Chance", "Change", "Channel", "Chapter", "Character", "Characteristic", "Characterize",
-    	    "Charge", "Charity", "Chart", "Chase", "Cheap", "Check", "Cheek", "Cheese", "Chef", "Chemical", "Chest",
-    	    "Chicken", "Chief", "Child", "Childhood", "Chinese", "Chip", "Chocolate", "Choice", "Choose", "Christian",
-    	    "Christmas", "Church", "Cigarette", "Circle", "Circumstance", "Cite", "Citizen", "City", "Civil",
-    	    "Civilian", "Claim", "Class", "Classic", "Classroom", "Clean", "Clear", "Clearly", "Client", "Climate",
-    	    "Climb", "Clinic", "Clinical", "Clock", "Close", "Closely", "Closer", "Clothes", "Clothing", "Cloud",
-    	    "Club", "Clue", "Cluster", "Coach", "Coal", "Coalition", "Coast", "Coastal", "Coat", "Code", "Coffee",
-    	    "Cognitive", "Cold", "Collapse", "Collar", "Colleague", "Collect", "Collection", "Collective", "College",
-    	    "Colonel", "Colonial", "Color", "Column", "Combination", "Combine", "Come", "Comedy", "Comfort",
-    	    "Comfortable", "Command", "Commander", "Comment", "Commercial", "Commission", "Commit", "Commitment",
-    	    "Committee", "Common", "Communicate", "Communication", "Community", "Company", "Compare", "Comparison",
-    	    "Compete", "Competition", "Competitive", "Competitor", "Complaint", "Complete", "Completely", "Complex",
-    	    "Component", "Compose", "Composition", "Comprehensive", "Computer", "Concentrate", "Concentration", "Concept",
-    	    "Concern", "Concerned", "Concert", "Conclude", "Conclusion", "Concrete", "Condition", "Conduct", "Conference",
-    	    "Confidence", "Confident", "Confirm", "Conflict", "Confront", "Confuse", "Confusion", "Congress",
-    	    "Connect", "Connection", "Conscious", "Consciousness", "Consent", "Consequently", "Consider", "Considerable",
-    	    "Consideration", "Consist", "Consistent", "Constant", "Constantly", "Constitute", "Constitution",
-    	    "Construct", "Construction", "Consult", "Consultant", "Consume", "Consumer", "Consumption", "Contact",
-    	    "Contain", "Container", "Contemporary", "Content", "Contest", "Context", "Continental", "Continue",
-    	    "Continued", "Continuous", "Contract", "Contrast", "Contribution", "Control", "Convenient", "Convention",
-    	    "Conventional", "Conversation", "Convert", "Conviction", "Convince", "Cook", "Cookie", "Cooking", 
-    	    "Cool","Dance", "Danger", "Dare", "Dark", "Data", "Date", "Daughter", "Day", "Dead", "Deal",
-    	    "Death", "Debate", "Debt", "Decade", "Decide", "Decision", "Declare", "Decrease", "Deep", "Defense",
-    	    "Define", "Degree", "Delay", "Deliver", "Demand", "Democracy", "Demonstrate", "Density", "Department", "Depend",
-    	    "Depression", "Derive", "Describe", "Description", "Design", "Desire", "Desk", "Desperate", "Despite", "Destroy"};
+
+    public static Random random = new Random();
+    public int idWord;
+    public List<String> dictionary; //List to store the words from the csv.
     private JComboBox<String> languageComboBox;
     private JComboBox<String> modeComboBox;
     private JButton startButton;
+    private JButton restartButton;
     private JTextArea outputArea;
+    private JPanel wordPanel;
+    private Timer showTimer;
+    private Timer hideTimer;
+    private int wordIndex;
+    private JLabel currentWordLabel;
+    private List<String> wordsDisplayed; //List to store the words that are shown.
 
     public Display() {
         setTitle("Memory Word Game");
-        setSize(400, 300);
+        setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Crear panel principal
+        //Main panel.
         JPanel panel = new JPanel(new BorderLayout());
 
-        // Panel superior con selección de idioma y modo
+        //Language and mode panels.
         JPanel topPanel = new JPanel(new GridLayout(2, 2));
         topPanel.add(new JLabel("Select Language:"));
         languageComboBox = new JComboBox<>(new String[]{"Español", "English", "Deutsch", "Italiano", "Français"});
@@ -101,16 +48,27 @@ public class Display extends JFrame {
         topPanel.add(modeComboBox);
         panel.add(topPanel, BorderLayout.NORTH);
 
-        // Botón de inicio
+        //Start game button.
         startButton = new JButton("Start Game");
         panel.add(startButton, BorderLayout.CENTER);
 
-        // Área de salida
+        //Output Area.
         outputArea = new JTextArea();
         outputArea.setEditable(false);
         panel.add(new JScrollPane(outputArea), BorderLayout.SOUTH);
 
-        // Agregar ActionListener al botón
+        //Restart button.
+        restartButton = new JButton("Restart");
+        restartButton.setVisible(false);
+        restartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                restartGame();
+            }
+        });
+        panel.add(restartButton, BorderLayout.SOUTH);
+
+        //ActionListener to StartButton;
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -118,14 +76,13 @@ public class Display extends JFrame {
             }
         });
 
-        // Añadir panel al frame
         add(panel);
     }
 
     private void startGame() {
         int languageIndex = languageComboBox.getSelectedIndex();
         int modeIndex = modeComboBox.getSelectedIndex();
-        outputArea.setText(""); // Limpiar área de salida
+        outputArea.setText(""); //Clean the output.
 
         switch (languageIndex) {
             case 0:
@@ -145,6 +102,31 @@ public class Display extends JFrame {
                 break;
         }
 
+        //Remove start button and show words.
+        Container parent = startButton.getParent();
+        parent.remove(startButton);
+        parent.revalidate();
+        parent.repaint();
+
+        //Show restart button.
+        restartButton.setVisible(true);
+
+        //Create and add word panel.
+        wordPanel = new JPanel(new GridBagLayout());
+        parent.add(wordPanel, BorderLayout.CENTER);
+        parent.revalidate();
+        parent.repaint();
+
+        wordsDisplayed = new ArrayList<>();
+        //Relative path.
+        String userDir = System.getProperty("user.dir");
+        String relativePath = "src/gui/words.csv";
+        String absolutePath = userDir + File.separator + relativePath;
+
+        //Method to read the words from the CSV.
+        dictionary = readWordsFromCSV(absolutePath);
+
+        //Mode selection.
         switch (modeIndex) {
             case 0:
                 randomGenIncrease();
@@ -160,11 +142,10 @@ public class Display extends JFrame {
 
     private void randomGenIncrease() {
         outputArea.append("Increasing mode selected.\n");
-        // Aquí va la lógica del modo en aumento
     }
 
     private void randomGenConcrete() {
-    	String input = JOptionPane.showInputDialog(this, "Enter the number of words to display:");
+        String input = JOptionPane.showInputDialog(this, "Enter the number of words to display:");
         outputArea.append("Concrete mode selected.\n");
         try {
             int n = Integer.parseInt(input);
@@ -173,14 +154,116 @@ public class Display extends JFrame {
                 return;
             }
 
-            outputArea.append("Concrete mode selected. Displaying " + n + " words:\n");
-            for (int i = 0; i < n; i++) {
-                int idWord = random.nextInt(dictionary.length);
-                outputArea.append(dictionary[idWord] + "\n");
-            }
+            wordIndex = 0;
+            //Timer starts with 1-second delay for the first word.
+            showTimer = new Timer(1000, new ActionListener() { 
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (wordIndex < n) {
+                        if (currentWordLabel != null) {
+                            wordPanel.remove(currentWordLabel);
+                            wordPanel.revalidate();
+                            wordPanel.repaint();
+                        }
+
+                        int idWord = random.nextInt(1292);
+                        String word = dictionary.get(idWord);
+                        wordsDisplayed.add(word);
+                        currentWordLabel = new JLabel(word, SwingConstants.CENTER);
+                        currentWordLabel.setFont(new Font("Arial", Font.BOLD, 36));
+                        GridBagConstraints gbc = new GridBagConstraints();
+                        gbc.gridx = 0;
+                        gbc.gridy = 0;
+                        gbc.weightx = 1.0;
+                        gbc.weighty = 1.0;
+                        gbc.anchor = GridBagConstraints.CENTER;
+                        wordPanel.add(currentWordLabel, gbc);
+                        wordPanel.revalidate();
+                        wordPanel.repaint();
+                        //After the first word, set delay to 4 seconds.
+                        wordIndex++;
+                        if (wordIndex == 1) {
+                            showTimer.setDelay(4000);
+                        }
+                        //Timer to hide the word 0.5 seconds before the next word.
+                        hideTimer = new Timer(3500, new ActionListener() { 
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                wordPanel.remove(currentWordLabel);
+                                wordPanel.revalidate();
+                                wordPanel.repaint();
+                                hideTimer.stop();
+                            }
+                        });
+                        hideTimer.setRepeats(false);
+                        hideTimer.start();
+                    } else {
+                        showTimer.stop();
+                        askWords(); 
+                    }
+                }
+            });
+            showTimer.setInitialDelay(0); 
+            showTimer.start();
         } catch (NumberFormatException e) {
             outputArea.append("Invalid input. Please enter a valid integer.\n");
         }
+    }
+
+    private void askWords() {
+        int correctCount = 0;
+        for (int i = 0; i < wordsDisplayed.size(); i++) {
+            String userInput = JOptionPane.showInputDialog(this, "Enter word " + (i + 1) + ":");
+            if (userInput != null && userInput.equals(wordsDisplayed.get(i))) {
+                correctCount++;
+            }
+        }
+        JOptionPane.showMessageDialog(this, "You remembered " + correctCount + " out of " + wordsDisplayed.size() + " words correctly.");
+
+        outputArea.append("You remembered " + correctCount + " out of " + wordsDisplayed.size() + " words correctly.\n");
+        outputArea.setCaretPosition(outputArea.getDocument().getLength());
+
+        wordsDisplayed.clear();
+    }
+
+    private List<String> readWordsFromCSV(String fileName) {
+        List<String> words = new ArrayList<>();
+        String line;
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+
+                if (parts.length >= 2) {
+                    String word = parts[1].trim().replaceAll("\"", ""); 
+                    words.add(word);
+                }
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error reading CSV file: " + e.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return words;
+    }
+
+    private void restartGame() {
+        if (showTimer != null) {
+            showTimer.stop();
+        }
+        if (hideTimer != null) {
+            hideTimer.stop();
+        }
+
+        if (wordPanel != null) {
+            wordPanel.removeAll();
+            wordPanel.revalidate();
+            wordPanel.repaint();
+        }
+
+        restartButton.setVisible(false);
+
+        Container parent = restartButton.getParent();
+        parent.add(startButton, BorderLayout.CENTER);
+        parent.revalidate();
+        parent.repaint();
     }
 
     public static void main(String[] args) {
