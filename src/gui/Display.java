@@ -389,7 +389,10 @@ public class Display extends JFrame {
         for (int i = 0; i < currentSequence.size(); i++) {
             String word = currentSequence.get(i);
             String userResponse = userResponses.size() > i ? userResponses.get(i) : ""; // Si no hay respuesta, dejar en blanco
-            comparison.append("Tu respuesta: ").append(i + 1).append(userResponse).append("\n").append("\nPalabra ").append(i + 1).append(": ").append(word);
+            if(i!=0) {
+            	comparison.append("\n");
+            }
+            comparison.append("Tu respuesta ").append(i + 1).append(": ").append(userResponse).append("\nPalabra ").append(i + 1).append(": ").append(word);
         }
 
         // Mostrar las palabras correctas y la comparación en una ventana emergente
