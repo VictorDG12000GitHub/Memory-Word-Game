@@ -15,7 +15,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class Display extends JFrame {
+public class DisplayE extends JFrame {
 
     public static Random random = new Random();
     public int idWord;
@@ -35,7 +35,7 @@ public class Display extends JFrame {
     private Map<String, Map<String, String>> translations;
     private int sequenceLength;
 
-    public Display() {
+    public DisplayE() {
         setTitle("Memory Word Game");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -212,92 +212,113 @@ public class Display extends JFrame {
     }
 
     private void randomGenIncrease(String languageCode) {
-        String increasingModeMessage = translations.get(languageCode).get("increasingMode");
-        outputArea.append(increasingModeMessage + "\n");
+    	List<String> palabras = new ArrayList<>();
+		wordIndex = 0;
+		currentSequence = new ArrayList<>();
 
-        wordIndex = 0;
-        List<List<String>> allSequences = new ArrayList<>(); // Lista para almacenar todas las secuencias generadas
+		showTimer = new Timer(4500, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (currentWordLabel != null) {
+					wordPanel.remove(currentWordLabel);
+					wordPanel.revalidate();
+					wordPanel.repaint();
+				}
 
-        Timer[] hideCurrentSequenceTimer = new Timer[1]; // Array para almacenar el temporizador de ocultar secuencia actual
+					int idWord = random.nextInt(dictionary.size());
+					String word = dictionary.get(idWord);
+					currentSequence.add(word);
+					currentWordLabel = new JLabel(word, SwingConstants.CENTER);
+					currentWordLabel.setFont(new Font("Arial", Font.BOLD, 36));
+					GridBagConstraints gbc = new GridBagConstraints();
+					gbc.gridx = 0;
+					gbc.gridy = 0;
+					gbc.weightx = 1.0;
+					gbc.weighty = 1.0;
+					gbc.anchor = GridBagConstraints.CENTER;
+					wordPanel.add(currentWordLabel, gbc);
+					wordPanel.revalidate();
+					wordPanel.repaint();
 
-        showTimer = new Timer(4500, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Eliminar el JLabel anterior si existe
-                if (currentWordLabel != null) {
-                    wordPanel.remove(currentWordLabel);
-                    currentWordLabel = null; // Liberar referencia al JLabel anterior
-                    wordPanel.revalidate();
-                    wordPanel.repaint();
-                }
+					hideTimer = new Timer(4000, new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							wordPanel.remove(currentWordLabel);
+							wordPanel.revalidate();
+							wordPanel.repaint();
+							hideTimer.stop();
+						}
+					});
+					hideTimer.setRepeats(false);
+					hideTimer.start();
 
-                currentSequence = new ArrayList<>(); // Lista para la secuencia actual
-                // Generar la secuencia de palabras
-                for (int i = 0; i < sequenceLength; i++) {
-                    int idWord = random.nextInt(dictionary.size());
-                    String word = dictionary.get(idWord);
-                    currentSequence.add(word);
-                }
+					wordIndex++;
+			
+			}
+		});
+		showTimer.setInitialDelay(570);
+		showTimer.start();
+		/*try {
+            // Espera 3000 milisegundos (3 segundos)
+            Thread.sleep(30000);
+        } catch (InterruptedException e) {
+            System.err.println("El sueño fue interrumpido");
+        }*/
+    	for(int m=0;m<100;m++) {
+    		final int n=m;
+    		wordIndex = 0;
+    		currentSequence = new ArrayList<>();
 
-                allSequences.add(currentSequence); // Agregar la secuencia actual a la lista de todas las secuencias
+    		showTimer = new Timer(4500, new ActionListener() {
+    			@Override
+    			public void actionPerformed(ActionEvent e) {
+    				if (currentWordLabel != null) {
+    					wordPanel.remove(currentWordLabel);
+    					wordPanel.revalidate();
+    					wordPanel.repaint();
+    				}
 
-                // Construir la cadena para mostrar todas las secuencias
-                StringBuilder allSequencesDisplay = new StringBuilder();
-                for (List<String> seq : allSequences) {
-                    StringBuilder sequenceToDisplay = new StringBuilder();
-                    for (String w : seq) {
-                        sequenceToDisplay.append(w).append(" ");
-                    }
-                    allSequencesDisplay.append(sequenceToDisplay.toString().trim()).append("\n");
-                }
+    				if (wordIndex < n) {
+    					int idWord = random.nextInt(dictionary.size());
+    					String word = dictionary.get(idWord);
+    					currentSequence.add(word);
+    					currentWordLabel = new JLabel(word, SwingConstants.CENTER);
+    					currentWordLabel.setFont(new Font("Arial", Font.BOLD, 36));
+    					GridBagConstraints gbc = new GridBagConstraints();
+    					gbc.gridx = 0;
+    					gbc.gridy = 0;
+    					gbc.weightx = 1.0;
+    					gbc.weighty = 1.0;
+    					gbc.anchor = GridBagConstraints.CENTER;
+    					wordPanel.add(currentWordLabel, gbc);
+    					wordPanel.revalidate();
+    					wordPanel.repaint();
 
-                currentWordLabel = new JLabel(allSequencesDisplay.toString().trim(), SwingConstants.CENTER);
-                currentWordLabel.setFont(new Font("Arial", Font.BOLD, 36));
-                GridBagConstraints gbc = new GridBagConstraints();
-                gbc.gridx = 0;
-                gbc.gridy = 0;
-                gbc.weightx = 1.0;
-                gbc.weighty = 1.0;
-                gbc.anchor = GridBagConstraints.CENTER;
-                wordPanel.add(currentWordLabel, gbc);
-                wordPanel.revalidate();
-                wordPanel.repaint();
-                
+    					hideTimer = new Timer(4000, new ActionListener() {
+    						@Override
+    						public void actionPerformed(ActionEvent e) {
+    							wordPanel.remove(currentWordLabel);
+    							wordPanel.revalidate();
+    							wordPanel.repaint();
+    							hideTimer.stop();
+    						}
+    					});
+    					hideTimer.setRepeats(false);
+    					hideTimer.start();
 
-                // Iniciar temporizador para ocultar la secuencia actual
-                hideCurrentSequenceTimer[0] = new Timer(3500, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        wordPanel.remove(currentWordLabel);
-                        wordPanel.revalidate();
-                        wordPanel.repaint();
-                        hideCurrentSequenceTimer[0].stop();
-
-                        // Preguntar por cada palabra de la secuencia actual
-                        int correctAnswers = 0;
-                        for (int j = 0; j < currentSequence.size(); j++) {
-                            String userInput = JOptionPane.showInputDialog(null,
-                                    translations.get(languageCode).get("enterWord") + " " + (j + 1) + ":");
-                            if (userInput != null && userInput.equals(currentSequence.get(j))) {
-                                correctAnswers++;
-                            }
-                        }
-                        System.out.println(correctAnswers + " de " + currentSequence.size() + ".");
-                        
-
-                        // Reiniciar el temporizador principal para mostrar la nueva secuencia
-                        showTimer.restart();
-                    }
-                });
-                hideCurrentSequenceTimer[0].setRepeats(false);
-                hideCurrentSequenceTimer[0].start();
-
-                showTimer.stop();
-            }
-        });
-        showTimer.setInitialDelay(570);
-        showTimer.start();
+    					wordIndex++;
+    				} else {
+    					showTimer.stop();
+    					askWords(languageCode);
+    				}
+    			}
+    		});
+    		showTimer.setInitialDelay(570);
+    		showTimer.start();
+    	}
     }
+    	
+
 
     private void randomGenConcrete(String languageCode) {
         String input = JOptionPane.showInputDialog(this, translations.get(languageCode).get("enterNumberOfWords"));
@@ -363,18 +384,12 @@ public class Display extends JFrame {
     }
 
     private void askWords(String languageCode) {
-        int correctCount = 0;        
-        List<String> userResponses = new ArrayList<>(); // Lista para almacenar las respuestas del usuario
-
+        int correctCount = 0;
         for (int i = 0; i < currentSequence.size(); i++) {
             String userInput = JOptionPane.showInputDialog(this, translations.get(languageCode).get("enterWord") + " " + (i + 1) + ":");
-            if(userInput != null) {
-            	userResponses.add(userInput); // Almacenar la respuesta del usuario
-            	if (userInput.equals(currentSequence.get(i))) {
-                    correctCount++;
-                }
+            if (userInput != null && userInput.equals(currentSequence.get(i))) {
+                correctCount++;
             }
-
         }
         JOptionPane.showMessageDialog(this, translations.get(languageCode).get("rememberedWords")
                 .replace("{0}", String.valueOf(correctCount))
@@ -383,25 +398,7 @@ public class Display extends JFrame {
         outputArea.append(translations.get(languageCode).get("rememberedWords")
                 .replace("{0}", String.valueOf(correctCount))
                 .replace("{1}", String.valueOf(currentSequence.size())) + "\n");
-        
-        
-        StringBuilder comparison = new StringBuilder();
-        for (int i = 0; i < currentSequence.size(); i++) {
-            String word = currentSequence.get(i);
-            String userResponse = userResponses.size() > i ? userResponses.get(i) : ""; // Si no hay respuesta, dejar en blanco
-            comparison.append("Tu respuesta: ").append(i + 1).append(userResponse).append("\n").append("\nPalabra ").append(i + 1).append(": ").append(word);
-        }
 
-        // Mostrar las palabras correctas y la comparación en una ventana emergente
-        JOptionPane.showMessageDialog(this, translations.get(languageCode).get("correctWordsComparisonMessage")
-                .replace("{0}", comparison.toString().trim()));
-
-        // También mostrar la comparación en el área de salida
-        outputArea.append(translations.get(languageCode).get("correctWordsComparisonMessage")
-                .replace("{0}", comparison.toString().trim()) + "\n");
-
-        
-        
         currentSequence.clear();
         sequenceLength = 1;
 
@@ -439,7 +436,7 @@ public class Display extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new Display().setVisible(true);
+                new DisplayE().setVisible(true);
             }
         });
     }
